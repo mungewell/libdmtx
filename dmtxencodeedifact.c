@@ -41,6 +41,8 @@ AppendValueEdifact(DmtxEncodeStream *stream, DmtxByte value)
 
    CHKSCHEME(DmtxSchemeEdifact);
 
+   /* TBD Check for FNC1 translation */
+
    if(value < 31 || value > 94)
    {
       StreamMarkInvalid(stream, DmtxChannelUnsupportedChar);

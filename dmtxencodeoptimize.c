@@ -74,7 +74,7 @@ static void DumpStreams(DmtxEncodeStream *streamBest)
  *
  */
 static int
-EncodeOptimizeBest(DmtxByteList *input, DmtxByteList *output, int sizeIdxRequest)
+EncodeOptimizeBest(DmtxByteList *input, DmtxByteList *output, int sizeIdxRequest, int fnc1)
 {
    enum SchemeState state;
    int inputNext, c40ValueCount, textValueCount, x12ValueCount;
@@ -135,15 +135,15 @@ EncodeOptimizeBest(DmtxByteList *input, DmtxByteList *output, int sizeIdxRequest
       }
 
       dmtxByteListClear(&ctxTemp);
-      PushCTXValues(&ctxTemp, input->b[inputNext], DmtxSchemeC40, &passFail);
+      PushCTXValues(&ctxTemp, input->b[inputNext], DmtxSchemeC40, &passFail, fnc1);
       c40ValueCount += ((passFail == DmtxPass) ? ctxTemp.length : 1);
 
       dmtxByteListClear(&ctxTemp);
-      PushCTXValues(&ctxTemp, input->b[inputNext], DmtxSchemeText, &passFail);
+      PushCTXValues(&ctxTemp, input->b[inputNext], DmtxSchemeText, &passFail, fnc1);
       textValueCount += ((passFail == DmtxPass) ? ctxTemp.length : 1);
 
       dmtxByteListClear(&ctxTemp);
-      PushCTXValues(&ctxTemp, input->b[inputNext], DmtxSchemeX12, &passFail);
+      PushCTXValues(&ctxTemp, input->b[inputNext], DmtxSchemeX12, &passFail, fnc1);
       x12ValueCount += ((passFail == DmtxPass) ? ctxTemp.length : 1);
 
 /*    DumpStreams(streamsBest); */

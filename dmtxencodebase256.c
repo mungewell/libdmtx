@@ -39,6 +39,8 @@ AppendValueBase256(DmtxEncodeStream *stream, DmtxByte value)
 {
    CHKSCHEME(DmtxSchemeBase256);
 
+   /* TBD Check for FNC1 character */
+
    StreamOutputChainAppend(stream, Randomize255State(value, stream->output->length + 1)); CHKERR;
    stream->outputChainValueCount++;
 

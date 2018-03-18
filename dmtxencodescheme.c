@@ -85,11 +85,12 @@
  *
  */
 static int
-EncodeSingleScheme(DmtxByteList *input, DmtxByteList *output, int sizeIdxRequest, DmtxScheme scheme)
+EncodeSingleScheme(DmtxByteList *input, DmtxByteList *output, int sizeIdxRequest, DmtxScheme scheme, int fnc1)
 {
    DmtxEncodeStream stream;
 
    stream = StreamInit(input, output);
+   stream.fnc1 = fnc1;
 
    /* Continue encoding until complete */
    while(stream.status == DmtxStatusEncoding)
