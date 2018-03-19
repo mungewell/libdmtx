@@ -309,7 +309,8 @@ DecodeSchemeC40Text(DmtxMessage *msg, unsigned char *ptr, unsigned char *dataEnd
             }
             else if(c40Values[i] == 27) {
                if(msg->fnc1 != DmtxUndefined) {
-                   PushOutputWord(msg, msg->fnc1); /* FNC1 */
+                   /* output FNC1 as user defined character */
+                   PushOutputC40TextWord(msg, &state, msg->fnc1);
                }
             }
             else if(c40Values[i] == 30) {

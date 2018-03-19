@@ -469,7 +469,7 @@ PushCTXValues(DmtxByteList *valueList, DmtxByte inputValue, int targetScheme,
       /* targetScheme is C40 or Text */
 
       /* Check for FNC1 character */
-      if((int)inputValue == fnc1)
+      if(fnc1 != DmtxUndefined && (int)inputValue == fnc1)
       {
          dmtxByteListPush(valueList, DmtxValueCTXShift2, passFail); RETURN_IF_FAIL;
          dmtxByteListPush(valueList, 27, passFail); RETURN_IF_FAIL; /* FNC1 */
