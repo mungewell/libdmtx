@@ -25,6 +25,15 @@ EncodeNextChunkEdifact(DmtxEncodeStream *stream)
 
    if(StreamInputHasNext(stream))
    {
+      /* Check for FNC1 character, which needs to be sent in ASCII */
+      value = StreamInputPeekNext(stream); CHKERR;
+      if(stream->fnc1 != DmtxUndefined && (int)value == stream->fnc1) {
+         StreamInputAdvanceNext(stream);
+         EncodeChangeScheme(stream, DmtxSchemeAscii, DmtxUnlatchExplicit);
+         AppendValueAscii(stream, DmtxValueFNC1);
+         return;
+      }
+
       value = StreamInputAdvanceNext(stream); CHKERR;
       AppendValueEdifact(stream, value); CHKERR;
    }
@@ -40,8 +49,6 @@ AppendValueEdifact(DmtxEncodeStream *stream, DmtxByte value)
    DmtxByte edifactValue, previousOutput;
 
    CHKSCHEME(DmtxSchemeEdifact);
-
-   /* TBD Check for FNC1 translation */
 
    if(value < 31 || value > 94)
    {
