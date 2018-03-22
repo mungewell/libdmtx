@@ -49,7 +49,13 @@ EncodeNextChunkCTX(DmtxEncodeStream *stream, int sizeIdxRequest)
              /* X12 does not allow partial blocks, resend last 1 or 2 as ASCII */
              EncodeChangeScheme(stream, DmtxSchemeAscii, DmtxUnlatchExplicit);
              for(i = 0; i < valueList.length % 3; i++)
-                AppendValueAscii(stream, (valueList.b[i])+1);
+                StreamInputAdvancePrev(stream);
+
+             while(i) {
+                inputValue = StreamInputAdvanceNext(stream); CHKERR;
+                AppendValueAscii(stream, inputValue + 1);
+                i--;
+             }
 
              StreamInputAdvanceNext(stream);
              AppendValueAscii(stream, DmtxValueFNC1);

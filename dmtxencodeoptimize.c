@@ -101,7 +101,7 @@ EncodeOptimizeBest(DmtxByteList *input, DmtxByteList *output, int sizeIdxRequest
       streamsBest[state] = StreamInit(input, &(outputsBest[state]));
       streamsBest[state].fnc1 = fnc1;
       streamsTemp[state] = StreamInit(input, &(outputsTemp[state]));
-      streamsBest[state].fnc1 = fnc1;
+      streamsTemp[state].fnc1 = fnc1;
    }
 
    c40ValueCount = textValueCount = x12ValueCount = 0;
