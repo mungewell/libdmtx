@@ -14,6 +14,8 @@
  * \brief Logic for optimized (multiple scheme) encoding
  */
 
+#define DUMP 0
+
 enum SchemeState {
    AsciiFull,
    AsciiCompactOffset0, /* 0 offset from first regular input value */
@@ -35,7 +37,7 @@ enum SchemeState {
    SchemeStateCount
 };
 
-/** temporary
+#if DUMP
 static void DumpStreams(DmtxEncodeStream *streamBest)
 {
    enum SchemeState state;
@@ -67,7 +69,8 @@ static void DumpStreams(DmtxEncodeStream *streamBest)
       dmtxByteListPrint(streamBest[state].output, prefix);
    }
 }
-*/
+#endif
+
 
 /**
  *
@@ -96,7 +99,9 @@ EncodeOptimizeBest(DmtxByteList *input, DmtxByteList *output, int sizeIdxRequest
       outputsBest[state] = dmtxByteListBuild(outputsBestStorage[state], sizeof(outputsBestStorage[state]));
       outputsTemp[state] = dmtxByteListBuild(outputsTempStorage[state], sizeof(outputsTempStorage[state]));
       streamsBest[state] = StreamInit(input, &(outputsBest[state]));
+      streamsBest[state].fnc1 = fnc1;
       streamsTemp[state] = StreamInit(input, &(outputsTemp[state]));
+      streamsBest[state].fnc1 = fnc1;
    }
 
    c40ValueCount = textValueCount = x12ValueCount = 0;
@@ -146,7 +151,9 @@ EncodeOptimizeBest(DmtxByteList *input, DmtxByteList *output, int sizeIdxRequest
       PushCTXValues(&ctxTemp, input->b[inputNext], DmtxSchemeX12, &passFail, fnc1);
       x12ValueCount += ((passFail == DmtxPass) ? ctxTemp.length : 1);
 
-/*    DumpStreams(streamsBest); */
+#if DUMP
+      DumpStreams(streamsBest); 
+#endif
    }
 
    /* Choose the overall winner */
