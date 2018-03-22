@@ -33,6 +33,7 @@
 static void
 EncodeNextChunkCTX(DmtxEncodeStream *stream, int sizeIdxRequest)
 {
+   int i;
    DmtxPassFail passFail;
    DmtxByte inputValue;
    DmtxByte valueListStorage[6];
@@ -40,6 +41,21 @@ EncodeNextChunkCTX(DmtxEncodeStream *stream, int sizeIdxRequest)
 
    while(StreamInputHasNext(stream))
    {
+      if(stream->currentScheme == DmtxSchemeX12)
+      {
+          /* Check for FNC1 character */
+          inputValue = StreamInputPeekNext(stream); CHKERR;
+          if(stream->fnc1 != DmtxUndefined && (int)inputValue == stream->fnc1) {
+             /* X12 does not allow partial blocks, resend last 1 or 2 as ASCII */
+             EncodeChangeScheme(stream, DmtxSchemeAscii, DmtxUnlatchExplicit);
+             for(i = 0; i < valueList.length % 3; i++)
+                AppendValueAscii(stream, (valueList.b[i])+1);
+
+             StreamInputAdvanceNext(stream);
+             AppendValueAscii(stream, DmtxValueFNC1);
+             return;
+          }
+      }
       inputValue = StreamInputAdvanceNext(stream); CHKERR;
 
       /* Expand next input value into up to 4 CTX values and add to valueList */
@@ -263,8 +279,6 @@ CompletePartialC40Text(DmtxEncodeStream *stream, DmtxByteList *valueList, int si
       {
          /* End of symbol condition (d) */
          EncodeChangeScheme(stream, DmtxSchemeAscii, DmtxUnlatchImplicit); CHKERR;
-         /* check FNC1 first? */
-         /* think this assumes all input can be encoded as ASCII, not true */
          AppendValueAscii(stream, outputTmp.b[0]); CHKERR;
 
          /* Register progress since encoding happened outside normal path */
@@ -427,13 +441,6 @@ PushCTXValues(DmtxByteList *valueList, DmtxByte inputValue, int targetScheme,
    /* Handle all other characters according to encodation scheme */
    if(targetScheme == DmtxSchemeX12)
    {
-      /* FNC1 is only possible in TEXT or C40 Set2 */
-      if((int)inputValue == fnc1)
-      {
-         *passFail = DmtxFail;
-         return;
-      }
-
       if(inputValue == 13)
       {
          dmtxByteListPush(valueList, 0, passFail); RETURN_IF_FAIL;
@@ -472,7 +479,7 @@ PushCTXValues(DmtxByteList *valueList, DmtxByte inputValue, int targetScheme,
       if(fnc1 != DmtxUndefined && (int)inputValue == fnc1)
       {
          dmtxByteListPush(valueList, DmtxValueCTXShift2, passFail); RETURN_IF_FAIL;
-         dmtxByteListPush(valueList, 27, passFail); RETURN_IF_FAIL; /* FNC1 */
+         dmtxByteListPush(valueList, 27, passFail); RETURN_IF_FAIL; /* C40 version of FNC1 */
       }
       else if(inputValue <= 31)
       {
